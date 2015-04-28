@@ -1,0 +1,10 @@
+name: 'GameOfLife'
+version: 0.0.1
+description: >
+  A simple, but readable Game Of Life app.
+author: Rajiv Nair <rajivrnair@gmail.com>
+#homepage: https://www.example.com
+environment:
+  sdk: '>=1.0.0 <2.0.0'
+dependencies:
+  browser: '>=0.10.0 <0.11.0'
