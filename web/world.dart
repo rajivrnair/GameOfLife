@@ -94,13 +94,16 @@ class World {
 
   List<List<Cell>> _createBlankState() {
     List<List<Cell>> blankState = new List<List<Cell>>();
-    for (int row = 0; row < limit; row++) {
+
+    _rows.forEach((row) {
       List<Cell> list = new List<Cell>();
-      for (int col = 0; col < limit; col++) {
-        list.add(new Cell.die());
-      }
       blankState.add(list);
-    }
+
+      _cols.forEach((col) {
+        list.add(new Cell.die());
+      });
+    });
+
     return blankState;
   }
 
