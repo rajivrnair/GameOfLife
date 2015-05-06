@@ -8,13 +8,15 @@ class World {
 
   final int NEIGHBOURS_IN_PREMIUM_NEIGHBOURHOOD = 3;
   final int NEIGHBOURS_IN_OPTIMUM_NEIGHBOURHOOD = 4;
+  final int STATE_DEAD = 0;
+  final int STATE_ALIVE = 1;
 
   List<List<Cell>> _currentState, _newState;
-  int limit;
+  int worldsEnd;
 
   static World create(int dimensions) {
     var newWorld = new World();
-    newWorld.limit = dimensions;
+    newWorld.worldsEnd = dimensions;
     _rows = new List<int>.generate(dimensions, (int index) => index);
     _cols = new List<int>.generate(dimensions, (int index) => index);
     return newWorld;
@@ -26,7 +28,7 @@ class World {
   }
 
   World goForthAndMultiply() {
-    new Timer.periodic(new Duration(milliseconds: 1000), (timer) => _evolve());
+    new Timer.periodic(new Duration(milliseconds: 500), (timer) => _evolve());
     return this;
   }
 
@@ -47,42 +49,58 @@ class World {
   }
 
   int _getLiveNeighboursOf(int row, int col) {
-    int count = (_currentState[row][col].alive) ? 1 : 0;
+    int count = _amIDeadOrAlive(row, col);
 
-    if (col > 0) {
-      if (row > 0) {
-        count += (_currentState[row - 1][col - 1].alive) ? 1 : 0; // left up
-      }
+    count += _isTopLeftNeighbourAlive(row, col);
+    count += _isLeftNeighbourAlive(row, col);
+    count += _isBottomLeftNeighbourAlive(row, col);
 
-      count += (_currentState[row][col - 1].alive) ? 1 : 0; // left
+    count += _isNeighbourAboveAlive(row, col);
+    count += _isNeighbourBelowAlive(row, col);
 
-      if (row < (limit - 1)) {
-        count += (_currentState[row + 1][col - 1].alive) ? 1 : 0; // left down
-      }
-    }
-
-    if (row > 0) {
-      count += (_currentState[row - 1][col].alive) ? 1 : 0; // up
-    }
-
-    if (row < (limit - 1)) {
-      count += (_currentState[row + 1][col].alive) ? 1 : 0; // down
-    }
-
-    if (col < (limit - 1)) {
-      if (row > 0) {
-        count += (_currentState[row - 1][col + 1].alive) ? 1 : 0; //right up
-      }
-
-      count += (_currentState[row][col + 1].alive) ? 1 : 0; //right
-
-      if (row < (limit - 1)) {
-        count += (_currentState[row + 1][col + 1].alive) ? 1 : 0; // right down
-      }
-    }
+    count += _isTopRightNeighbourAlive(row, col);
+    count += _isRightNeighbourAlive(row, col);
+    count += _isBottomRightNeighbourAlive(row, col);
 
     return count;
   }
+
+  int _isBottomRightNeighbourAlive(row, col) =>
+      (_notRightMostCol(col) && _notBottomRow(row)) ? _isAlive(_rowBelow(row), _colRight(col)) : STATE_DEAD;
+
+  int _isRightNeighbourAlive(row, col) => _notRightMostCol(col) ? _isAlive(row, _colRight(col)) : STATE_DEAD;
+
+  int _isTopRightNeighbourAlive(int row, int col) =>
+      (_notRightMostCol(col) && _notTopRow(row)) ? _isAlive(_rowAbove(row), _colRight(col)) : STATE_DEAD;
+
+  int _isTopLeftNeighbourAlive(int row, int col) =>
+      (_notLeftMostCol(col) && _notTopRow(row)) ? _isAlive(_rowAbove(row),_colLeft(col)) : STATE_DEAD;
+
+  int _isLeftNeighbourAlive(int row, int col) => _notLeftMostCol(col) ? _isAlive(row,_colLeft(col)) : STATE_DEAD;
+
+  int _isBottomLeftNeighbourAlive(int row, int col) =>
+      (_notLeftMostCol(col) && _notBottomRow(row)) ? _isAlive(_rowBelow(row),_colLeft(col)) : STATE_DEAD;
+
+  int _isNeighbourAboveAlive(int row, int col) => _notTopRow(row) ? _isAlive(_rowAbove(row), col) : STATE_DEAD;
+
+  int _isNeighbourBelowAlive(int row, int col) => _notBottomRow(row) ? _isAlive(_rowBelow(row), col) : STATE_DEAD;
+
+  int _amIDeadOrAlive(int row, int col) => _isAlive(row, col);
+
+  int _isAlive(int row, int col) => (_currentState[row][col].alive) ? STATE_ALIVE : STATE_DEAD;
+
+
+  bool _notTopRow(int row) => row > 0;
+  bool _notBottomRow(int row) => row < (worldsEnd - 1);
+  bool _notLeftMostCol(int col) => col > 0;
+  bool _notRightMostCol(int col) => col < (worldsEnd - 1);
+
+
+  int _rowAbove(int row) => row - 1;
+  int _rowBelow(int row) => row + 1;
+  int _colLeft(int col) => col - 1;
+  int _colRight(int col) => col + 1;
+
 
   bool _isNiceNeighbourhood(int liveNeighbours) {
     return liveNeighbours == NEIGHBOURS_IN_PREMIUM_NEIGHBOURHOOD;

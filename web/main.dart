@@ -25,7 +25,7 @@ List<int> rows, cols;
 void main() {
 
   World world = World.create(DIMENSIONS)
-                  .giveBirthTo(LifeForms.blinker())
+                  .giveBirthTo(LifeForms.rPentomino())
                   .goForthAndMultiply();
 
   paint(world);
@@ -36,7 +36,7 @@ void paint(World world) {
   setTitle('Conway\'s Game Of Life');
   initCanvas(world);
 
-  new Timer.periodic(new Duration(milliseconds: 500), (timer) => redraw(world));
+  new Timer.periodic(new Duration(milliseconds: 250), (timer) => redraw(world));
 }
 
 void redraw(World world) {
@@ -46,21 +46,21 @@ void redraw(World world) {
 
   // Is this readable?
   rows.forEach((row) {
-    cols.where((col) => isAlive(world.cellAt(row, col)))
+    cols.where((col) => isCellAlive(world.cellAt(row, col)))
         .forEach((col) => colourCell(world.cellAt(row, col), row, col));
   });
 
   // Or are double for-loops more intuitive for matrix operations?
-//  for (int row = 0; row < world.limit; row++) {
-//    for (int col = 0; col < world.limit; col++) {
-//      if(isAlive(world.cellAt(row, col))) {
+//  for (int row = 0; row < world.worldsEnd; row++) {
+//    for (int col = 0; col < world.worldsEnd; col++) {
+//      if(isCellAlive(world.cellAt(row, col))) {
 //        colourCell(world.cellAt(row, col), row, col);
 //      }
 //    }
 //  }
 }
 
-bool isAlive(Cell cell) {
+bool isCellAlive(Cell cell) {
   return cell.alive == true;
 }
 
@@ -82,7 +82,7 @@ void drawBackground(World world) {
   ctx.strokeStyle = LINE_COLOUR;
   ctx.beginPath();
 
-  for (int index = 0; index < world.limit; index++) {
+  for (int index = 0; index < world.worldsEnd; index++) {
 
     // columns
     ctx.moveTo(cellSize * index, 0);
@@ -102,8 +102,8 @@ void setTitle(String title) {
 void initCanvas(World world) {
   canvas = querySelector('#canvas');
   ctx = canvas.getContext('2d');
-  cellSize = 500 ~/ world.limit;
+  cellSize = 500 ~/ world.worldsEnd;
 
-  rows = new List<int>.generate(world.limit, (int index) => index);
-  cols = new List<int>.generate(world.limit, (int index) => index);
+  rows = new List<int>.generate(world.worldsEnd, (int index) => index);
+  cols = new List<int>.generate(world.worldsEnd, (int index) => index);
 }
