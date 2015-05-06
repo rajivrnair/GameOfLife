@@ -25,7 +25,7 @@ List<int> rows, cols;
 void main() {
 
   World world = World.create(DIMENSIONS)
-                  .giveBirthTo(LifeForms.rPentomino())
+                  .giveBirthTo(LifeForms.blinker())
                   .goForthAndMultiply();
 
   paint(world);
