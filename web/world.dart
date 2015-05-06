@@ -1,4 +1,6 @@
 library gol.world;
+
+import 'dart:async';
 import 'cell.dart';
 
 class World {
@@ -7,28 +9,16 @@ class World {
   List<List<Cell>> newState;
   int limit;
 
-  static World create() {
-    return new World();
-  }
-
-  World withLimits(int limit) {
-    this.limit = limit;
-    return this;
+  static World create(int dimensions) {
+    var newWorld = new World();
+    newWorld.limit = dimensions;
+    return newWorld;
   }
 
   World giveBirthTo(List<List<Cell>> cells) {
     currentState = cells;
     return this;
   }
-
-//  void printState(List<List<Cell>> state) {
-//    for(int row = 0; row<limit; row++) {
-//      for(int col = 0;col<limit; col++) {
-//        bool cellState = state[row][col].alive;
-//        print('cell[$row][$col]: $cellState');
-//      }
-//    }
-//  }
 
   World evolve() {
     newState = createBlankState();
@@ -106,7 +96,12 @@ class World {
     newState = null;
   }
 
-  Cell getCell(int row, int col) {
+  Cell cellAt(int row, int col) {
     return currentState[row][col];
+  }
+
+  World goForthAndMultiply() {
+    new Timer.periodic(new Duration(milliseconds: 1000), (timer) => evolve());
+    return this;
   }
 }
