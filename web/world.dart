@@ -12,13 +12,13 @@ class World {
   final int STATE_ALIVE = 1;
 
   List<List<Cell>> _currentState, _newState;
-  int worldsEnd;
+  int size;
 
-  static World create(int dimensions) {
+  static World create(int size) {
     var newWorld = new World();
-    newWorld.worldsEnd = dimensions;
-    _rows = new List<int>.generate(dimensions, (int index) => index);
-    _cols = new List<int>.generate(dimensions, (int index) => index);
+    newWorld.size = size;
+    _rows = new List<int>.generate(size, (int index) => index);
+    _cols = new List<int>.generate(size, (int index) => index);
     return newWorld;
   }
 
@@ -91,9 +91,9 @@ class World {
 
 
   bool _notTopRow(int row) => row > 0;
-  bool _notBottomRow(int row) => row < (worldsEnd - 1);
+  bool _notBottomRow(int row) => row < (size - 1);
   bool _notLeftMostCol(int col) => col > 0;
-  bool _notRightMostCol(int col) => col < (worldsEnd - 1);
+  bool _notRightMostCol(int col) => col < (size - 1);
 
 
   int _rowAbove(int row) => row - 1;

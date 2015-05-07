@@ -5,7 +5,7 @@ import 'world.dart';
 import 'cell.dart';
 import 'lifeForms.dart' show LifeForms;
 
-final int DIMENSIONS = 6;
+final int SIZE_OF_THE_WORLD = 6;
 final String LINE_COLOUR = "#786969";
 final String LIVING_CELL_COLOUR = "#6DC066";
 final String LIVING_CELL_BORDER = "#8D6590";
@@ -24,7 +24,7 @@ List<int> rows, cols;
   */
 void main() {
 
-  World world = World.create(DIMENSIONS)
+  World world = World.create(SIZE_OF_THE_WORLD)
                   .giveBirthTo(LifeForms.rPentomino())
                   .goForthAndMultiply();
 
@@ -82,7 +82,7 @@ void drawBackground(World world) {
   ctx.strokeStyle = LINE_COLOUR;
   ctx.beginPath();
 
-  for (int index = 0; index < world.worldsEnd; index++) {
+  for (int index = 0; index < world.size; index++) {
 
     // columns
     ctx.moveTo(cellSize * index, 0);
@@ -102,8 +102,8 @@ void setTitle(String title) {
 void initCanvas(World world) {
   canvas = querySelector('#canvas');
   ctx = canvas.getContext('2d');
-  cellSize = 500 ~/ world.worldsEnd;
+  cellSize = 500 ~/ world.size;
 
-  rows = new List<int>.generate(world.worldsEnd, (int index) => index);
-  cols = new List<int>.generate(world.worldsEnd, (int index) => index);
+  rows = new List<int>.generate(world.size, (int index) => index);
+  cols = new List<int>.generate(world.size, (int index) => index);
 }
