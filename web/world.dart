@@ -6,45 +6,50 @@ import 'cell.dart';
 class World {
   static List<int> _rows, _cols;
 
-  final int NEIGHBOURS_IN_PREMIUM_NEIGHBOURHOOD = 3;
-  final int NEIGHBOURS_IN_OPTIMUM_NEIGHBOURHOOD = 4;
+  final int NUMBER_OF_NEIGHBOURS_FOR_NEW_LIFE = 3;
+  final int NUMBER_OF_NEIGHBOURS_FOR_CURRENT_STATE = 4;
   final int STATE_DEAD = 0;
   final int STATE_ALIVE = 1;
 
   List<List<Cell>> _currentState, _newState;
   int size;
+  int generation;
 
-  static World create(int size) {
-    var newWorld = new World();
-    newWorld.size = size;
+  static World create() {
+    return new World();
+  }
+
+  World withLife(List<List<Cell>> initialState) {
+    this.size = initialState.length;
+    this.generation = 0;
+    _currentState = initialState;
+
     _rows = new List<int>.generate(size, (int index) => index);
     _cols = new List<int>.generate(size, (int index) => index);
-    return newWorld;
-  }
 
-  World giveBirthTo(List<List<Cell>> someShape) {
-    _currentState = someShape;
     return this;
   }
 
-  World goForthAndMultiply() {
-    new Timer.periodic(new Duration(milliseconds: 500), (timer) => _evolve());
+  World evolve() {
+    new Timer.periodic(new Duration(milliseconds: 500), (timer) => _nextGeneration());
     return this;
   }
 
-  World _evolve() {
+  World _nextGeneration() {
     _newState = _createBlankState();
 
     _rows.forEach((row) {
       _cols.forEach((col) {
         int liveNeighbours = _getLiveNeighboursOf(row, col);
 
-        _newState[row][col] = _isNiceNeighbourhood(liveNeighbours)? new Cell.live()
-            : _isMovingOutImpossible(liveNeighbours)? new Cell(_currentCellState(row, col)) : new Cell.die();
+        _newState[row][col] = _canCellComeAlive(liveNeighbours)? new Cell.live()
+            : _canCellContinueAsIs(liveNeighbours)? new Cell(_currentCellState(row, col)) : new Cell.die();
       });
     });
 
     _switchStates();
+    this.generation++;
+
     return this;
   }
 
@@ -102,12 +107,12 @@ class World {
   int _colRight(int col) => col + 1;
 
 
-  bool _isNiceNeighbourhood(int liveNeighbours) {
-    return liveNeighbours == NEIGHBOURS_IN_PREMIUM_NEIGHBOURHOOD;
+  bool _canCellComeAlive(int liveNeighbours) {
+    return liveNeighbours == NUMBER_OF_NEIGHBOURS_FOR_NEW_LIFE;
   }
 
-  bool _isMovingOutImpossible(int liveNeighbours) {
-    return liveNeighbours == NEIGHBOURS_IN_OPTIMUM_NEIGHBOURHOOD;
+  bool _canCellContinueAsIs(int liveNeighbours) {
+    return liveNeighbours == NUMBER_OF_NEIGHBOURS_FOR_CURRENT_STATE;
   }
 
   List<List<Cell>> _createBlankState() {
@@ -132,7 +137,11 @@ class World {
 
   bool _currentCellState(int row, int col) => _currentState[row][col].alive;
 
-  Cell cellAt(int row, int col) {
+  Cell _cellAt(int row, int col) {
     return _currentState[row][col];
+  }
+
+  bool isCellAliveAt(int row, int col) {
+    return _cellAt(row, col).alive;
   }
 }

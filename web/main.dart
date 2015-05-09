@@ -1,19 +1,6 @@
-import 'dart:html';
-import 'dart:async';
-
 import 'world.dart';
-import 'cell.dart';
+import 'canvas.dart';
 import 'lifeForms.dart' show LifeForms;
-
-final int SIZE_OF_THE_WORLD = 6;
-final String LINE_COLOUR = "#786969";
-final String LIVING_CELL_COLOUR = "#6DC066";
-final String LIVING_CELL_BORDER = "#8D6590";
-
-CanvasRenderingContext2D ctx;
-CanvasElement canvas;
-int cellSize;
-List<int> rows, cols;
 
 /**
   * Conway's Game of Life rules:
@@ -24,86 +11,9 @@ List<int> rows, cols;
   */
 void main() {
 
-  World world = World.create(SIZE_OF_THE_WORLD)
-                  .giveBirthTo(LifeForms.rPentomino())
-                  .goForthAndMultiply();
+  World world = World.create()
+                  .withLife(LifeForms.rPentomino())
+                  .evolve();
 
-  paint(world);
-}
-
-
-void paint(World world) {
-  setTitle('Conway\'s Game Of Life');
-  initCanvas(world);
-
-  new Timer.periodic(new Duration(milliseconds: 250), (timer) => redraw(world));
-}
-
-void redraw(World world) {
-  clearCanvas();
-  drawBackground(world);
-  setColouringStyles();
-
-  // Is this readable?
-  rows.forEach((row) {
-    cols.where((col) => isCellAlive(world.cellAt(row, col)))
-        .forEach((col) => colourCell(world.cellAt(row, col), row, col));
-  });
-
-  // Or are double for-loops more intuitive for matrix operations?
-//  for (int row = 0; row < world.worldsEnd; row++) {
-//    for (int col = 0; col < world.worldsEnd; col++) {
-//      if(isCellAlive(world.cellAt(row, col))) {
-//        colourCell(world.cellAt(row, col), row, col);
-//      }
-//    }
-//  }
-}
-
-bool isCellAlive(Cell cell) {
-  return cell.alive == true;
-}
-
-void setColouringStyles() {
-  ctx.strokeStyle = LIVING_CELL_BORDER;
-  ctx.fillStyle = LIVING_CELL_COLOUR;
-}
-
-void clearCanvas() {
-  canvas.width = canvas.width;
-}
-
-void colourCell(Cell cell, int row, int col) {
-  ctx.fillRect(row * cellSize, col * cellSize, cellSize, cellSize);
-  ctx.strokeRect(row * cellSize, col * cellSize, cellSize, cellSize);
-}
-
-void drawBackground(World world) {
-  ctx.strokeStyle = LINE_COLOUR;
-  ctx.beginPath();
-
-  for (int index = 0; index < world.size; index++) {
-
-    // columns
-    ctx.moveTo(cellSize * index, 0);
-    ctx.lineTo(cellSize * index, 500);
-
-    // rows
-    ctx.moveTo(0, cellSize * index);
-    ctx.lineTo(500, cellSize * index);
-  }
-  ctx.stroke();
-}
-
-void setTitle(String title) {
-  querySelector('#title').text = title;
-}
-
-void initCanvas(World world) {
-  canvas = querySelector('#canvas');
-  ctx = canvas.getContext('2d');
-  cellSize = 500 ~/ world.size;
-
-  rows = new List<int>.generate(world.size, (int index) => index);
-  cols = new List<int>.generate(world.size, (int index) => index);
+  Canvas.paint(world);
 }
